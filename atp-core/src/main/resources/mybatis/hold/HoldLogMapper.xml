@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lsh.atp.core.dao.hold.HoldLogDao" >
+
+	<resultMap id="holdLogResultMap" type="HoldLog">
+		<id property="id" column="ID"/>
+		<result property="holdId" column="HOLD_ID"/>
+		<result property="channel" column="CHANNEL"/>
+		<result property="sequenceId" column="SEQUENCE_ID"/>
+		<result property="operationType" column="OPERATION_TYPE"/>
+		<result property="content" column="CONTENT"/>
+		<result property="createdAt" column="CREATED_AT"/>
+		<result property="updatedAt" column="UPDATED_AT"/>
+	</resultMap>
+  
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="HoldLog">
+		insert into HOLD_LOG (
+			HOLD_ID,CHANNEL,SEQUENCE_ID,OPERATION_TYPE,CONTENT,CREATED_AT,
+			UPDATED_AT
+    	) values (
+			#{holdId},#{channel},#{sequenceId},#{operationType},#{content},#{createdAt},
+			#{updatedAt}
+    	)
+	</insert>
+
+	<update id="update" parameterType="HoldLog">
+		update HOLD_LOG
+    	<set>
+  			<if test="holdId != null">HOLD_ID=#{holdId},</if>
+  			<if test="channel != null">CHANNEL=#{channel},</if>
+  			<if test="sequenceId != null">SEQUENCE_ID=#{sequenceId},</if>
+  			<if test="operationType != null">OPERATION_TYPE=#{operationType},</if>
+  			<if test="content != null">CONTENT=#{content},</if>
+  			<if test="createdAt != null">CREATED_AT=#{createdAt},</if>
+  			<if test="updatedAt != null">UPDATED_AT=#{updatedAt}</if>
+		</set>
+		where ID=#{id}
+	</update>
+  
+	<select id="getHoldLogById" parameterType="int" resultMap="holdLogResultMap">
+		select * from HOLD_LOG
+		where ID=#{id} 
+	</select>
+  
+	<select id="countHoldLog" parameterType="map" resultType="int">
+		select count(*) from HOLD_LOG
+		<include refid="queryCondition"/>
+	</select>
+  
+	<select id="getHoldLogList" parameterType="map" resultMap="holdLogResultMap">
+		select * from HOLD_LOG
+		<include refid="queryCondition"/>
+		<if test="start != null and limit != null">
+		limit #{start},#{limit}
+		</if>
+	</select>
+  
+	<sql id="queryCondition">
+		<where>
+			<if test="id != null">ID=#{id}</if>
+			<if test="holdId != null">and HOLD_ID=#{holdId}</if>
+			<if test="channel != null">and CHANNEL=#{channel}</if>
+			<if test="sequenceId != null">and SEQUENCE_ID=#{sequenceId}</if>
+			<if test="operationType != null">and OPERATION_TYPE=#{operationType}</if>
+			<if test="content != null">and CONTENT=#{content}</if>
+			<if test="createdAt != null">and CREATED_AT=#{createdAt}</if>
+			<if test="updatedAt != null">and UPDATED_AT=#{updatedAt}</if>
+		</where>
+	</sql>
+   
+</mapper>

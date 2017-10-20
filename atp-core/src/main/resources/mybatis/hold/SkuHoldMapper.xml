@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lsh.atp.core.dao.hold.SkuHoldDao" >
+
+	<resultMap id="skuHoldResultMap" type="SkuHold">
+		<id property="id" column="ID"/>
+		<result property="pid" column="PID"/>
+		<result property="status" column="STATUS"/>
+		<result property="holdEndTime" column="HOLD_END_TIME"/>
+		<result property="sequenceId" column="SEQUENCE_ID"/>
+		<result property="createdAt" column="CREATED_AT"/>
+		<result property="updatedAt" column="UPDATED_AT"/>
+		<result property="areaId" column="AREA_ID"/>
+		<result column="CHANNEL" property="channel" jdbcType="INTEGER" />
+		<result column="HOLD_NO" property="holdNo" jdbcType="VARCHAR" />
+		<result column="ZONE_CODE" property="zoneCode" jdbcType="VARCHAR" />
+	</resultMap>
+
+	<!-- 查询预占及商品信息 -->
+	<resultMap id="skuHoldResultDetailsMap" type="SkuHold" >
+		<!-- 预占信息信息 -->
+		<id property="id" column="ID"/>
+		<result property="pid" column="PID"/>
+		<result property="status" column="STATUS"/>
+		<result property="holdEndTime" column="HOLD_END_TIME"/>
+		<result property="sequenceId" column="SEQUENCE_ID"/>
+		<result property="createdAt" column="CREATED_AT"/>
+		<result property="updatedAt" column="UPDATED_AT"/>
+		<result property="areaId" column="AREA_ID"/>
+		<result column="CHANNEL" property="channel" jdbcType="INTEGER" />
+		<result column="HOLD_NO" property="holdNo" jdbcType="VARCHAR" />
+		<result column="ZONE_CODE" property="zoneCode" jdbcType="VARCHAR" />
+		<!-- 预占商品明细-->
+		<collection property="skuHoldQtyList" ofType="SkuHoldQty">
+			<id property="id" column="HID"/>
+			<result property="holdId" column="HOLD_ID"/>
+			<result property="skuId" column="SKU_ID"/>
+			<result property="holdQty" column="HOLD_QTY"/>
+		</collection>
+
+	</resultMap>
+
+  
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="SkuHold">
+		 insert into SKU_HOLD (ID, PID, STATUS,
+      HOLD_END_TIME, SEQUENCE_ID, CREATED_AT,
+      UPDATED_AT, AREA_ID, CHANNEL,
+      HOLD_NO, ZONE_CODE)
+    values (#{id,jdbcType=BIGINT}, #{pid,jdbcType=BIGINT}, #{status,jdbcType=TINYINT},
+      #{holdEndTime}, #{sequenceId,jdbcType=VARCHAR}, #{createdAt},
+      #{updatedAt}, #{areaId,jdbcType=INTEGER}, #{channel,jdbcType=INTEGER},
+      #{holdNo,jdbcType=VARCHAR}, #{zoneCode,jdbcType=VARCHAR})
+	</insert>
+
+	<insert id="insertSelective" useGeneratedKeys="true" keyProperty="id" parameterType="SkuHold" >
+		insert into SKU_HOLD
+		<trim prefix="(" suffix=")" suffixOverrides="," >
+			<if test="id != null" >
+				ID,
+			</if>
+			<if test="pid != null" >
+				PID,
+			</if>
+			<if test="status != null" >
+				STATUS,
+			</if>
+			<if test="holdEndTime != null" >
+				HOLD_END_TIME,
+			</if>
+			<if test="sequenceId != null" >
+				SEQUENCE_ID,
+			</if>
+			<if test="createdAt != null" >
+				CREATED_AT,
+			</if>
+			<if test="updatedAt != null" >
+				UPDATED_AT,
+			</if>
+			<if test="areaId != null" >
+				AREA_ID,
+			</if>
+			<if test="channel != null" >
+				CHANNEL,
+			</if>
+			<if test="holdNo != null" >
+				HOLD_NO,
+			</if>
+			<if test="zoneCode != null" >
+				ZONE_CODE,
+			</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides="," >
+			<if test="id != null" >
+				#{id,jdbcType=BIGINT},
+			</if>
+			<if test="pid != null" >
+				#{pid,jdbcType=BIGINT},
+			</if>
+			<if test="status != null" >
+				#{status,jdbcType=TINYINT},
+			</if>
+			<if test="holdEndTime != null" >
+				#{holdEndTime},
+			</if>
+			<if test="sequenceId != null" >
+				#{sequenceId,jdbcType=VARCHAR},
+			</if>
+			<if test="createdAt != null" >
+				#{createdAt},
+			</if>
+			<if test="updatedAt != null" >
+				#{updatedAt},
+			</if>
+			<if test="areaId != null" >
+				#{areaId,jdbcType=INTEGER},
+			</if>
+			<if test="channel != null" >
+				#{channel,jdbcType=INTEGER},
+			</if>
+			<if test="holdNo != null" >
+				#{holdNo,jdbcType=VARCHAR},
+			</if>
+			<if test="zoneCode != null" >
+				#{zoneCode,jdbcType=VARCHAR},
+			</if>
+		</trim>
+	</insert>
+
+	<update id="update" parameterType="SkuHold">
+		update SKU_HOLD
+    	<set>
+  			<if test="pid != null">PID=#{pid},</if>
+  			<if test="status != null">STATUS=#{status},</if>
+  			<if test="holdEndTime != null">HOLD_END_TIME=#{holdEndTime},</if>
+  			<if test="sequenceId != null">SEQUENCE_ID=#{sequenceId},</if>
+  			<if test="createdAt != null">CREATED_AT=#{createdAt},</if>
+  			<if test="updatedAt != null">UPDATED_AT=#{updatedAt}</if>
+			<if test="areaId != null">AREA_ID=#{areaId}</if>
+			<if test="holdNo != null">HOLD_NO=#{holdNo}</if>
+			<if test="zoneCode != null">ZONE_CODE=#{zoneCode}</if>
+			<if test="channel != null">CHANNEL=#{channel}</if>
+
+
+		</set>
+		where ID=#{id}
+	</update>
+  
+	<select id="getSkuHoldById" parameterType="long" resultMap="skuHoldResultMap">
+		select * from SKU_HOLD
+		where ID=#{id} 
+	</select>
+  
+	<select id="countSkuHold" parameterType="map" resultType="int">
+		select count(*) from SKU_HOLD
+		<include refid="queryCondition"/>
+	</select>
+  
+	<select id="getSkuHoldList" parameterType="map" resultMap="skuHoldResultMap">
+		select * from SKU_HOLD
+		<include refid="queryCondition"/>
+		<if test="start != null and limit != null">
+		limit #{start},#{limit}
+		</if>
+	</select>
+
+	<select id="getSkuHoldDetailList" parameterType="map" resultMap="skuHoldResultDetailsMap">
+		SELECT SH.ID,
+		SH.PID,
+		SH.`STATUS`,
+		SH.HOLD_END_TIME,
+		SH.SEQUENCE_ID,
+		SH.CREATED_AT,
+		SH.UPDATED_AT,
+		SH.AREA_ID,
+		SH.CHANNEL,
+		SH.HOLD_NO,
+		SH.ZONE_CODE,
+		SHQ.ID AS HID,
+		SHQ.HOLD_ID,
+		SHQ.SKU_ID,
+		SHQ.HOLD_QTY
+		FROM SKU_HOLD SH LEFT JOIN SKU_HOLD_QTY SHQ ON SH.ID = SHQ.HOLD_ID
+		WHERE SH.`STATUS` = 1 and SHQ.HOLD_QTY &gt; 0
+
+		<if test="holdEndTime != null">and SH.HOLD_END_TIME &lt; #{holdEndTime}</if>
+
+	</select>
+  
+	<sql id="queryCondition">
+		<where>
+			<if test="id != null">ID=#{id}</if>
+			<if test="pid != null">and PID=#{pid}</if>
+			<if test="status != null">and STATUS=#{status}</if>
+			<if test="holdEndTime != null">and HOLD_END_TIME=#{holdEndTime}</if>
+			<if test="sequenceId != null">and SEQUENCE_ID=#{sequenceId}</if>
+			<if test="createdAt != null">and CREATED_AT=#{createdAt}</if>
+			<if test="updatedAt != null">and UPDATED_AT=#{updatedAt}</if>
+			<if test="areaId != null">and AREA_ID=#{areaId}</if>
+			<if test="holdNo != null">and HOLD_NO=#{holdNo}</if>
+			<if test="zoneCode != null">and ZONE_CODE=#{zoneCode}</if>
+			<if test="channel != null">and CHANNEL=#{channel}</if>
+
+		</where>
+	</sql>
+
+	<select id="getSkuHoldByIdAndSequenceId"  resultMap="skuHoldResultMap">
+		select * from SKU_HOLD
+		where ID=#{id}
+		and SEQUENCE_ID=#{sequenceId}
+	</select>
+
+	<update id="updateStatus" parameterType="SkuHold">
+		update SKU_HOLD
+		SET STATUS=#{status}
+		where ID=#{id}
+		<if test="status == 3">and STATUS != 3</if>
+		<if test="status == 2">and STATUS = 1</if>
+		<if test="status == 1">and STATUS = 1</if>
+	</update>
+
+	<select id="getSkuHoldByHoldNo" resultMap="skuHoldResultMap">
+		SELECT * FROM SKU_HOLD
+		WHERE HOLD_NO = #{holdNo}
+	</select>
+
+	<select id="getSkuHoldByChannelAndSequence" resultMap="skuHoldResultMap">
+		SELECT * FROM SKU_HOLD
+		WHERE SEQUENCE_ID = #{sequence}
+		AND CHANNEL = #{channel}
+	</select>
+
+	<select id="getSkuHoldIdBySequenceId" resultType="int">
+		SELECT ID FROM SKU_HOLD WHERE SEQUENCE_ID IN
+		<foreach collection="sequences" index="index" item="sequence" separator="," open="(" close=")">
+			#{sequence}
+		</foreach>
+		and STATUS IN (1,2)
+	</select>
+</mapper>

@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lsh.atp.core.dao.hold.SkuHoldQtyDao" >
+
+	<resultMap id="skuHoldQtyResultMap" type="SkuHoldQty">
+		<id property="id" column="ID"/>
+		<result property="holdId" column="HOLD_ID"/>
+		<result property="skuId" column="SKU_ID"/>
+		<result property="holdQty" column="HOLD_QTY"/>
+		<result column="DC" property="dc" jdbcType="VARCHAR" />
+		<result property="restoreQty" column="RESTORE_QTY"/>
+        <result property="supplyId" column="SUPPLY_ID" />
+	</resultMap>
+  
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="SkuHoldQty">
+		insert into SKU_HOLD_QTY
+		(ID, HOLD_ID, SKU_ID, HOLD_QTY, DC ,RESTORE_QTY)
+   	   values (#{id,jdbcType=BIGINT}, #{holdId,jdbcType=BIGINT}, #{skuId,jdbcType=BIGINT},
+      #{holdQty,jdbcType=BIGINT}, #{dc,jdbcType=VARCHAR},#{restoreQty,jdbcType=BIGINT})
+	</insert>
+
+	<insert id="insertAll" useGeneratedKeys="true" parameterType="java.util.List">
+		insert into SKU_HOLD_QTY (ID, HOLD_ID, SKU_ID, HOLD_QTY, DC ,SUPPLY_ID,RESTORE_QTY)
+		values
+		<foreach collection="list" item="item" index="index" separator="," open="" close="">
+			(#{item.id,jdbcType=BIGINT},
+			#{item.holdId,jdbcType=BIGINT},
+			#{item.skuId,jdbcType=BIGINT},
+			#{item.holdQty,jdbcType=BIGINT},
+			#{item.dc,jdbcType=VARCHAR},
+			#{item.supplyId,jdbcType=INTEGER},
+			#{item.restoreQty,jdbcType=BIGINT}
+			)
+		</foreach>
+	</insert>
+
+	<update id="update" parameterType="SkuHoldQty">
+		update SKU_HOLD_QTY
+    	<set>
+  			<if test="holdId != null">HOLD_ID=#{holdId},</if>
+  			<if test="skuId != null">SKU_ID=#{skuId},</if>
+  			<if test="holdQty != null">HOLD_QTY=#{holdQty},</if>
+			<if test="dc != null">DC=#{dc},</if>
+			<if test="restoreQty != null">RESTORE_QTY=#{restoreQty}</if>
+		</set>
+		where ID=#{id}
+	</update>
+
+	<update id="preHoldQty" >
+		update SKU_HOLD_QTY
+		<set>
+			<if test="qty != null">HOLD_QTY = HOLD_QTY - #{qty}</if>
+		</set>
+		where ID=#{id} and HOLD_QTY >= #{qty}
+	</update>
+
+	<update id="preHoldHoldQty" >
+		update SKU_HOLD_QTY
+		<set>
+			<if test="qty != null">HOLD_QTY = HOLD_QTY - #{qty}</if>
+		</set>
+		where HOLD_ID=#{holdId}
+		AND SKU_ID=#{itemId}
+		AND HOLD_QTY >= #{qty}
+	</update>
+  
+	<select id="getSkuHoldQtyById" parameterType="int" resultMap="skuHoldQtyResultMap">
+		select * from SKU_HOLD_QTY
+		where ID=#{id} 
+	</select>
+
+    <select id="getSkuHoldByHoldIdAndSkuId"  resultMap="skuHoldQtyResultMap">
+        select * from SKU_HOLD_QTY
+        where HOLD_ID=#{holdId}
+        and SKU_ID=#{itemId}
+    </select>
+  
+	<select id="countSkuHoldQty" parameterType="map" resultType="int">
+		select count(*) from SKU_HOLD_QTY
+		<include refid="queryCondition"/>
+	</select>
+  
+	<select id="getSkuHoldQtyList" parameterType="map" resultMap="skuHoldQtyResultMap">
+		select * from SKU_HOLD_QTY
+		<include refid="queryCondition"/>
+	</select>
+  
+	<sql id="queryCondition">
+		<where>
+			<if test="id != null">ID=#{id}</if>
+			<if test="holdId != null">and HOLD_ID=#{holdId}</if>
+			<if test="skuId != null">and SKU_ID=#{skuId}</if>
+			<if test="holdQty != null">and HOLD_QTY=#{holdQty}</if>
+		</where>
+        <if test="start != null and limit != null">
+        limit #{start},#{limit}
+    </if>
+
+    </sql>
+
+
+	<select id="isExistsBySkuAndHoldId" resultType="boolean">
+		select 1 from SKU_HOLD_QTY
+		where HOLD_ID=#{holdId}
+		and SKU_ID=#{skuId}
+		and HOLD_QTY=#{holdQty}
+		limit 1
+	</select>
+
+	<select id="getIdByHoldIdAndSkuId" resultType="long">
+		select ID from SKU_HOLD_QTY
+		where HOLD_ID=#{holdId}
+		and SKU_ID=#{skuId}
+	</select>
+
+	<update id="restoreSkuHoldQty">
+		update SKU_HOLD_QTY
+		set HOLD_QTY = HOLD_QTY + #{holdQty}
+		where ID = #{id}
+		and EXISTS (select 1 from SKU_HOLD where Id = #{sonSkuHoldId} and status != 3)
+	</update>
+
+	<select id="getSkuHoldListByHoldIdAndSkuIdList" resultMap="skuHoldQtyResultMap">
+		select * from SKU_HOLD_QTY
+        where HOLD_ID=#{holdId}
+		and EXISTS (select 1 from SKU_HOLD where ID=#{holdId} and AREA_ID=#{areaId})
+        and SKU_ID in <foreach collection="skuList" index="index" item="item" separator="," open="(" close=")">
+        #{item.itemId}
+    </foreach>
+	</select>
+
+    <select id="getSkuHoldQtyByHoldId" resultMap="skuHoldQtyResultMap">
+        select * from SKU_HOLD_QTY
+        where hold_id=#{holdId}
+    </select>
+
+
+	<select id="getSkuHoldQtyForConsignment" resultMap="skuHoldQtyResultMap">
+		SELECT * FROM SKU_HOLD_QTY
+		WHERE HOLD_ID=#{holdId}
+		AND SKU_ID IN <foreach collection="skuList" index="index" item="item" separator="," open="(" close=")">
+		#{item.itemId}
+	</foreach>
+	</select>
+
+    <update id="addRestoreQty">
+        UPDATE SKU_HOLD_QTY
+        SET RESTORE_QTY = RESTORE_QTY + #{num}
+        WHERE HOLD_ID = #{holdId}
+        AND SKU_ID = #{skuId}
+        AND DC = #{dc}
+    </update>
+	<!--SKU_ID, ifnull(sum(HOLD_QTY),0) as HOLD_QTY-->
+	<!--resultMap="skuHoldQtyResultMap"-->
+	<select id="getTotalHoldQty"  resultMap="skuHoldQtyResultMap" >
+		select SKU_ID, ifnull(sum(HOLD_QTY),0) as HOLD_QTY from SKU_HOLD_QTY
+		WHERE HOLD_ID IN
+		(SELECT ID FROM SKU_HOLD WHERE SEQUENCE_ID IN
+			<foreach collection="sequences" index="index" item="sequence" separator="," open="(" close=")">
+				#{sequence}
+			</foreach>
+		  and STATUS IN (1,2)
+		)
+		<!--
+		AND SKU_ID IN
+		<foreach collection="items" index="index" item="item" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+		-->
+		AND DC = #{dc}
+		GROUP BY SKU_ID
+	</select>
+
+	<select id="getTotalHoldQtyBySkuIdAndDc" resultMap="skuHoldQtyResultMap">
+		select SKU_ID, ifnull(sum(HOLD_QTY),0) as HOLD_QTY from SKU_HOLD_QTY
+		WHERE HOLD_ID IN
+			<foreach collection="holdIds" index="index" item="holdId" separator="," open="(" close=")">
+				#{holdId}
+			</foreach>
+		AND DC = #{dc}
+		GROUP BY SKU_ID
+	</select>
+	<select id="getTotalHoldQtySingle"  resultType="java.lang.Integer" >
+		select ifnull(sum(HOLD_QTY),0) from SKU_HOLD_QTY
+		WHERE HOLD_ID IN
+		(SELECT ID FROM SKU_HOLD WHERE SEQUENCE_ID IN
+		<foreach collection="sequences" index="index" item="sequence" separator="," open="(" close=")">
+			#{sequence}
+		</foreach>
+		)
+		AND SKU_ID = #{itemId}
+		AND DC = #{dc}
+	</select>
+
+</mapper>

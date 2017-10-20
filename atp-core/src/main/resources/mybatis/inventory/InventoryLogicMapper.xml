@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lsh.atp.core.dao.inventory.InventoryLogicDao" >
+
+	<resultMap id="inventoryLogicResultMap" type="InventoryLogic">
+		<id property="id" column="ID"/>
+		<result property="areaId" column="AREA_ID"/>
+		<result property="skuId" column="SKU_ID"/>
+		<result property="skuBatch" column="SKU_BATCH"/>
+		<result property="inventoryQuantity" column="INVENTORY_QUANTITY"/>
+		<result property="virtualNum" column="VIRTUAL_NUM"/>
+		<result property="freezeNum" column="FREEZE_NUM"/>
+		<result property="holdNum" column="HOLD_NUM"/>
+		<result property="status" column="STATUS"/>
+		<result property="createdAt" column="CREATED_AT"/>
+		<result property="updatedAt" column="UPDATED_AT"/>
+		<result property="dc" column="DC"/>
+        <result property="supplyId" column="SUPPLY_ID"/>
+		<result property="zoneCode" column="ZONE_CODE"/>
+	</resultMap>
+
+	<sql id="Base_Column_List" >
+		ID, AREA_ID, SKU_ID, SKU_BATCH, INVENTORY_QUANTITY, VIRTUAL_NUM, FREEZE_NUM, HOLD_NUM,
+		STATUS, CREATED_AT, UPDATED_AT, DC, ZONE_CODE
+	</sql>
+  
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="InventoryLogic">
+		insert into INVENTORY_LOGIC (
+			AREA_ID,SKU_ID,SKU_BATCH,INVENTORY_QUANTITY,VIRTUAL_NUM,FREEZE_NUM,
+			HOLD_NUM,STATUS,CREATED_AT,UPDATED_AT,DC,ZONE_CODE,SUPPLY_ID
+    	) values (
+			#{areaId},#{skuId},#{skuBatch},#{inventoryQuantity},#{virtualNum},#{freezeNum},
+			#{holdNum},#{status},unix_timestamp(now()),unix_timestamp(now()),#{dc},#{zoneCode},#{supplyId}
+    	)
+	</insert>
+
+	<update id="update" parameterType="InventoryLogic">
+		update INVENTORY_LOGIC
+    	<set>
+  			<if test="areaId != null">AREA_ID=#{areaId},</if>
+  			<if test="skuId != null">SKU_ID=#{skuId},</if>
+  			<if test="skuBatch != null">SKU_BATCH=#{skuBatch},</if>
+  			<if test="inventoryQuantity != null">INVENTORY_QUANTITY=#{inventoryQuantity},</if>
+  			<if test="virtualNum != null">VIRTUAL_NUM=#{virtualNum},</if>
+  			<if test="freezeNum != null">FREEZE_NUM=#{freezeNum},</if>
+  			<if test="holdNum != null">HOLD_NUM=#{holdNum},</if>
+  			<if test="status != null">STATUS=#{status},</if>
+  			<if test="createdAt != null">CREATED_AT=#{createdAt},</if>
+  			<if test="updatedAt != null">UPDATED_AT=#{updatedAt},</if>
+			<if test="dc != null">dc=#{dc},</if>
+			<if test="zoneCode != null">ZONE_CODE=#{zoneCode}</if>
+		</set>
+		where ID=#{id}
+	</update>
+
+	<update id="preHold" >
+		update INVENTORY_LOGIC
+		<set>
+			<if test="qty != null">INVENTORY_QUANTITY=INVENTORY_QUANTITY - #{qty},</if>
+			<if test="qty != null">HOLD_NUM=HOLD_NUM + #{qty},</if>
+		</set>
+		where ID=#{id} and INVENTORY_QUANTITY > #{qty}
+	</update>
+
+	<update id="preHoldInventoryLogic" >
+		update INVENTORY_LOGIC
+		set INVENTORY_QUANTITY=INVENTORY_QUANTITY - #{qty},
+			HOLD_NUM=HOLD_NUM + #{qty},
+			UPDATED_AT = unix_timestamp(now())
+		where AREA_ID=#{areaId}
+		AND SKU_ID=#{skuId}
+		and INVENTORY_QUANTITY >= #{qty}
+	</update>
+
+	<update id="preHoldLogicInventory" parameterType="com.lsh.atp.core.model.inventory.InventoryLogic" >
+		update INVENTORY_LOGIC
+		set INVENTORY_QUANTITY=INVENTORY_QUANTITY - #{holdNum},
+		HOLD_NUM=HOLD_NUM + #{holdNum},
+		UPDATED_AT = unix_timestamp(now())
+		where ID = #{id,jdbcType=BIGINT}
+		and INVENTORY_QUANTITY >= #{holdNum}
+	</update>
+
+	<update id="decreaseLogicInventory">
+		update INVENTORY_LOGIC
+		set INVENTORY_QUANTITY=INVENTORY_QUANTITY - #{holdNum},
+		UPDATED_AT = unix_timestamp(now())
+		where SKU_ID = #{itemId,jdbcType=BIGINT}
+		and ZONE_CODE = #{zoneCode}
+		and SUPPLY_ID = #{supply}
+		and DC = #{dc}
+		and INVENTORY_QUANTITY >= #{holdNum}
+	</update>
+
+
+    <select id="getInventoryLogicByAreaIdAndSkuId"  resultMap="inventoryLogicResultMap">
+        select * from INVENTORY_LOGIC
+        where AREA_ID=#{areaId}
+		and   SKU_ID=#{skuId}
+    </select>
+
+    <select id="getInventoryLogicBySupplyDc"  resultMap="inventoryLogicResultMap">
+        select ID,SKU_ID,SUPPLY_ID,DC,INVENTORY_QUANTITY from INVENTORY_LOGIC
+        where SKU_ID=#{skuId}
+        and ZONE_CODE = #{zoneCode}
+        and SUPPLY_ID = #{supply}
+        and   DC=#{dc}
+    </select>
+
+	<select id="getInventoryLogicBySku"  resultMap="inventoryLogicResultMap">
+		select ID,SKU_ID,SUPPLY_ID,DC,INVENTORY_QUANTITY,ZONE_CODE from INVENTORY_LOGIC
+		where SKU_ID=#{skuId}
+		and ZONE_CODE = #{zoneCode}
+	</select>
+  
+	<sql id="queryCondition">
+		<where>
+			<if test="id != null">ID=#{id}</if>
+			<if test="areaId != null">and AREA_ID=#{areaId}</if>
+			<if test="skuId != null">and SKU_ID=#{skuId}</if>
+			<if test="skuBatch != null">and SKU_BATCH=#{skuBatch}</if>
+			<if test="inventoryQuantity != null">and INVENTORY_QUANTITY=#{inventoryQuantity}</if>
+			<if test="virtualNum != null">and VIRTUAL_NUM=#{virtualNum}</if>
+			<if test="freezeNum != null">and FREEZE_NUM=#{freezeNum}</if>
+			<if test="holdNum != null">and HOLD_NUM=#{holdNum}</if>
+			<if test="status != null">and STATUS=#{status}</if>
+			<if test="createdAt != null">and CREATED_AT=#{createdAt}</if>
+			<if test="updatedAt != null">and UPDATED_AT=#{updatedAt}</if>
+			<if test="zoneCode != null">and ZONE_CODE=#{zoneCode}</if>
+			<if test="dc != null">and dc=#{dc}</if>
+		</where>
+	</sql>
+
+    <update id="syncInventoryQuantityByDc" parameterType="map">
+        UPDATE INVENTORY_LOGIC
+        INNER JOIN (
+        	SELECT IFNULL(SUM(C.SKU_QUANTITY), 0) AS QUANTITY
+        	FROM
+				INVENTORY_PHYSICAL C
+			WHERE
+				C.WAREHOUSE_CODE = #{dc}
+				AND C.SKU_ID = #{skuId}
+        ) AS B ON 1= 1
+        SET INVENTORY_QUANTITY =
+          IF(
+        	QUANTITY - HOLD_NUM >= 0,
+			QUANTITY - HOLD_NUM,
+			0
+          ),
+        UPDATED_AT = unix_timestamp(now())
+        WHERE
+        	DC = #{dc}
+        	AND SKU_ID = #{skuId}
+    </update>
+
+	<update id="restoreInventoryLogicByHold">
+		update INVENTORY_LOGIC
+		set INVENTORY_QUANTITY = INVENTORY_QUANTITY + #{qty},
+		HOLD_NUM = HOLD_NUM - #{qty},
+		UPDATED_AT = unix_timestamp(now())
+		where id = #{id}
+		and HOLD_NUM >= #{qty}
+		and EXISTS (select 1 from SKU_HOLD where id = #{skuHoldId} and status = 1)
+	</update>
+
+
+	<update id="restoreInventoryLogicByDecrease">
+		update INVENTORY_LOGIC
+		set INVENTORY_QUANTITY = INVENTORY_QUANTITY + #{qty},
+		UPDATED_AT = unix_timestamp(now())
+		where id = #{id}
+		and EXISTS (select 1 from SKU_HOLD where id = #{skuHoldId} and status = 2)
+	</update>
+
+	<update id="restoreHoldByDecrease">
+		update INVENTORY_LOGIC
+		set HOLD_NUM = HOLD_NUM + #{qty},
+		UPDATED_AT = unix_timestamp(now())
+		where AREA_ID = #{areaId}
+		and SKU_ID = #{skuId}
+		and EXISTS (select 1 from SKU_HOLD where id = #{skuHoldId} and status = 2)
+	</update>
+
+	<select id="getInventoryLogicByAreaIdAndSkuIdList" resultMap="inventoryLogicResultMap">
+		select * from INVENTORY_LOGIC
+		where AREA_ID=#{areaId}
+		and   SKU_ID in <foreach collection="skuList" index="index" item="item" separator="," open="(" close=")">
+				#{item.itemId}
+			  </foreach>
+	</select>
+
+
+
+	<select id="getInventoryLogicList" resultMap="inventoryLogicResultMap">
+		select SKU_ID,SUM(INVENTORY_QUANTITY) AS INVENTORY_QUANTITY from INVENTORY_LOGIC
+		where
+		SKU_ID in
+		<foreach collection="items" index="index" item="item" separator="," open="(" close=")">
+			#{item}
+		</foreach>
+		and ZONE_CODE= #{zoneCode}
+		<if test="dc != null">
+			and DC = #{dc}
+		</if>
+		and STATUS = 1
+		GROUP BY SKU_ID
+	</select>
+
+	<select id="getInventoryLogicByModel" parameterType="InventoryLogic" resultMap="inventoryLogicResultMap">
+		select * from INVENTORY_LOGIC
+		WHERE SKU_ID = #{skuId}
+		and ZONE_CODE = #{zoneCode}
+		and SUPPLY_ID = #{supplyId}
+		and DC = #{dc}
+	</select>
+
+	<update id="decreaseHoldSkuInventory" parameterType="map" >
+		update INVENTORY_LOGIC
+		set HOLD_NUM = HOLD_NUM - #{holdNum},
+		UPDATED_AT = unix_timestamp(now())
+		where ZONE_CODE=#{zoneCode}
+		AND SKU_ID=#{skuId, jdbcType=BIGINT}
+		<if test="dc != null">AND DC=#{dc}</if>
+		<if test="areaId != null">and AREA_ID=#{areaId}</if>
+		AND HOLD_NUM >= #{holdNum,jdbcType=BIGINT}
+		and EXISTS (
+			select 1 from SKU_HOLD
+			where ID = #{holdId, jdbcType=BIGINT}
+			AND  SEQUENCE_ID = #{sequence}
+			<if test="channel != null">AND  CHANNEL = #{channel}</if>
+			and STATUS = 1
+		)
+	</update>
+
+
+	<select id="getInventoryLogicDetail" resultMap="inventoryLogicResultMap">
+		select SKU_ID,INVENTORY_QUANTITY,DC from INVENTORY_LOGIC
+		where
+		SKU_ID = #{itemId}
+		and ZONE_CODE= #{zoneCode}
+	</select>
+
+	<insert id="insertAll" useGeneratedKeys="true" parameterType="java.util.List">
+		insert into INVENTORY_LOGIC (AREA_ID,SKU_ID,SKU_BATCH,INVENTORY_QUANTITY,VIRTUAL_NUM,FREEZE_NUM,
+		HOLD_NUM,STATUS,CREATED_AT,UPDATED_AT,DC,ZONE_CODE)
+		values
+		<foreach collection="list" item="item" index="index" separator="," open="" close="">
+			(#{item.areaId},
+			#{item.skuId},
+			#{item.skuBatch},
+			#{item.inventoryQuantity},
+			0,
+			0,
+			0,
+			1,
+			unix_timestamp(now()),
+			unix_timestamp(now()),
+			#{item.dc},
+			#{item.zoneCode})
+		</foreach>
+	</insert>
+
+	<update id="updateAll" parameterType="java.util.List">
+		<foreach collection="list" item="item" index="index" open="" close="" separator=";">
+			UPDATE INVENTORY_LOGIC
+				SET INVENTORY_QUANTITY =
+				IF(
+					#{item.inventoryQuantity} - HOLD_NUM >= 0,
+					#{item.inventoryQuantity} - HOLD_NUM,
+					0
+				),
+				UPDATED_AT = unix_timestamp(now())
+			WHERE
+			SKU_ID = #{item.skuId}
+			AND ZONE_CODE = #{item.zoneCode}
+			AND DC = #{item.dc}
+		</foreach>
+	</update>
+
+	<update id="updateInventoryLogic" parameterType="InventoryLogic">
+			UPDATE INVENTORY_LOGIC
+			SET INVENTORY_QUANTITY =
+			IF(
+			#{inventoryQuantity} - HOLD_NUM >= 0,
+			#{inventoryQuantity} - HOLD_NUM,
+			0
+			),
+			UPDATED_AT = unix_timestamp(now())
+			WHERE
+			ID = #{id}
+	</update>
+
+	<select id="getQty" resultType="java.lang.Long">
+		select INVENTORY_QUANTITY from INVENTORY_LOGIC
+		where SKU_ID = #{itemId}
+		  and ZONE_CODE = #{zoneCode}
+		  and SUPPLY_ID = #{supply}
+		  and DC = #{dc}
+	</select>
+</mapper>

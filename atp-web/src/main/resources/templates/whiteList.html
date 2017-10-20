@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <link href="bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="bootstrap-3.3.7-dist/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+    <title>添加白名单</title>
+    <style>
+        .row-margin-top {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+        <form id="whiteListForm"  action="#" th:action="@{/whiteList}" method="post" th:object="${itemWhite}">
+            <!--<div class="row row-margin-top">-->
+            <div class="form-group row row-margin-top">
+                <label class="col-md-1 control-label">区域 :</label>
+                <div class="col-md-3">
+                    <select id="zoneCode" name="zoneCode" class="form-control" th:filed="*{zoneCode}">
+                        <option value="1000">北京</option>
+                        <option value="1001">天津</option>
+                        <option value="1002">杭州</option>
+                    </select>
+                </div>
+
+                <label class="col-md-1 control-label">链商销售码 :</label>
+                <div class="col-md-3">
+                    <input class="form-control" type="text" id="skuId" name="skuId" th:field="*{skuId}"/>
+                </div>
+
+                <label class="col-md-1 control-label">链商商品码 :</label>
+                <div class="col-md-3">
+                    <input class="form-control" type="text" id="itemId" name="itemId" th:field="*{itemId}"/>
+                </div>
+            </div>
+
+
+            <div class="form-group row row-margin-top">
+                <label class="col-md-1 control-label">物美码 :</label>
+                <div class="col-md-3">
+                    <input class="form-control" type="text" id="wumartCode" name="wumartCode" th:field="*{wumartCode}"/>
+                </div>
+
+                <label class="col-md-1 control-label">售卖单位 :</label>
+                <div class="col-md-3">
+                    <input class="form-control" type="text" id="saleUnit" name="saleUnit" th:field="*{saleUnit}"/>
+                </div>
+
+                <label class="col-md-1 control-label">原价 :</label>
+                <div class="col-md-3">
+                    <input class="form-control" type="text" id="originPrice" name="originPrice" th:field="*{originPrice}"/>
+                </div>
+            </div>
+
+
+            <div class="form-group row row-margin-top">
+                <label class="col-md-1 control-label">成本价 :</label>
+                <div class="col-md-3">
+                    <input class="form-control" type="text" id="costPrice" name="originPrice" th:field="*{costPrice}"/>
+                </div>
+            </div>
+
+            <div class="form-group row row-margin-top">
+                <button type="button" onclick="addWhite()">添加白名单</button>
+            </div>
+        </form>
+    </div>
+
+
+
+<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<script src="bootstrap-3.3.7-dist/js/moment.min.js"></script>
+<script src="bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+<script src="bootstrap-3.3.7-dist/js/bootstrap-datetimepicker.min.js"></script>
+
+
+<script type="application/javascript">
+    /*<![CDATA[*/
+    $(function () {
+
+    });
+
+    function addWhite(){
+        if(validate() == false){
+            return false;
+        }
+        $.ajax({
+            type:"POST",
+            url:"whiteList/add",
+            data:$("#whiteListForm").serialize(),
+            success: function(msg) {
+                console.log(msg);
+                if(msg == true){
+                    alert("添加成功");
+                }else{
+                    alert("添加失败,请联系技术人员");
+                }
+                $("#whiteListForm")[0].reset()
+            }
+        });
+    }
+
+    function validate(){
+        $("#whiteListForm input").each(function(i){
+            var value = $(this).val();
+            if(value == "" || value == null){
+                alert($(this).attr('id') + "不能为空");
+                return false;
+            }
+        });
+        return true;
+    }
+    /*]]>*/
+</script>
+</body>
+</html>

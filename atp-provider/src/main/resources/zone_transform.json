@@ -1,0 +1,12 @@
+[
+  {
+    "channel":"1",
+    "zoneCode":"2000",
+    "realZoneCode":"1000"
+  },
+  {
+    "channel":"1",
+    "zoneCode":"3000",
+    "realZoneCode":"1000"
+  }
+]

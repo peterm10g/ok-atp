@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <link href="bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="bootstrap-3.3.7-dist/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+    <title>库存记录查询</title>
+    <style>
+        .row-margin-top {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <div class="row row-margin-top">
+        <form action="#" th:action="@{/queryInventoryRecord}" method="post" th:object="${inventoryRecodeQuery}" class="form-inline">
+            <div class="form-group">
+                <label>商品码</label>
+                <input class="form-control" type="text" id="itemId" name="itemId" th:field="*{itemId}"/>
+            </div>
+            <div class="form-group">
+                <label>物美码</label>
+                <input class="form-control" type="text" id="wumartCode" name="wumartCode" th:field="*{wumartCode}"/>
+            </div>
+            <div class="form-group">
+                <label>仓库</label>
+                <select id="dc" name="dc" class="form-control" th:filed="*{dc}">
+                    <option>All</option>
+                    <option>DC10</option>
+                    <option>DC42</option>
+                    <option>DC43</option>
+                    <option>DC09</option>
+                    <option>DC37</option>
+                    <option>DC55</option>
+                    <option>DC59</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>时间</label>
+                <div class='input-group date' id='datetimepicker1'>
+                    <input type='text' class="form-control" id="queryTime" name="queryTime" th:field="*{queryTime}" />
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>库存变化方式</label>
+                <select id="recordType" name="recordType" class="form-control" th:filed="*{recordType}">
+                    <option>All</option>
+                    <option>扣减</option>
+                    <option>还原</option>
+                    <option>库存同步</option>
+                </select>
+            </div>
+            <button class="btn btn-default"  onclick="validate()">查询</button>
+        </form>
+    </div>
+
+    <div class="row row-margin-top">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>库存变化时间</th>
+                    <th>itemId</th>
+                    <th>dc</th>
+                    <th>库存变动原因</th>
+                    <th>修改订单号</th>
+                    <th>修改库存量</th>
+                    <th>当前库存量(修改后)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="inventoryRecord : ${inventoryRecords}">
+                    <td th:text="${inventoryRecord.updatedFormat}"></td>
+                    <td th:text="${inventoryRecord.skuId}"></td>
+                    <td th:text="${inventoryRecord.dc}"></td>
+                    <td th:text="${inventoryRecord.recordType}"></td>
+                    <td th:text="${inventoryRecord.sequence_id}"></td>
+                    <td th:text="${inventoryRecord.changeQuantity}"></td>
+                    <td th:text="${inventoryRecord.currentQuantity}"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+<script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+<script src="bootstrap-3.3.7-dist/js/moment.min.js"></script>
+<script src="bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+<script src="bootstrap-3.3.7-dist/js/bootstrap-datetimepicker.min.js"></script>
+
+
+<script type="application/javascript">
+    /*<![CDATA[*/
+    $(function () {
+        $('#datetimepicker1').datetimepicker({
+            format: 'yyyy-mm-dd',
+            language: 'zh-CN',
+            minView: "month",
+            locale: moment.locale('zh-cn')
+        });
+    });
+
+    function validate(){
+        var wumartCode = $("#wumartCode").val();
+        var dc = $("#dc").val();
+        if(wumartCode != null && wumartCode != ""){
+            if(dc == null && dc == 'All'){
+                alert("物美码查询必须选择仓库(dc)");
+                return false;
+            }
+        }
+        $("form").submit();
+    }
+    /*]]>*/
+</script>
+</body>
+</html>

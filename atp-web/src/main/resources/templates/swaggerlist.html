@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8"/>
+    <link href="bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="bootstrap-3.3.7-dist/css/bootstrap-datetimepicker.min.css" rel="stylesheet"/>
+    <title>swagger</title>
+    <style>
+        .row-margin-top {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <ul>
+        <li th:each="project : ${projects}">
+            <span th:text="${project}"></span>
+            <a th:href="|swagger-ui/${project.key}|" th:text="${project.name}"></a>
+        </li>
+    </ul>
+</body>
+</html>

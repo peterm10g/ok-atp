@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lsh.atp.core.dao.backup.ItemDeliveryBackupDao" >
+
+	<resultMap id="itemDeliveryBackupResultMap" type="ItemDeliveryBackup">
+		<result property="id" column="ID"/>
+		<result property="skuId" column="SKU_ID"/>
+		<result property="marketId" column="MARKET_ID"/>
+		<result property="kunnr" column="KUNNR"/>
+		<result property="werks" column="WERKS"/>
+		<result property="maktx" column="MAKTX"/>
+		<result property="mmstatxt" column="MMSTATXT"/>
+		<result property="zkhspbm" column="ZKHSPBM"/>
+		<result property="lbkum" column="LBKUM"/>
+		<result property="meins" column="MEINS"/>
+		<result property="zdate" column="ZDATE"/>
+		<result property="ztime" column="ZTIME"/>
+		<result property="zuname" column="ZUNAME"/>
+		<result property="backuptime" column="BACKUPTIME"/>
+	</resultMap>
+  
+	<insert id="insert" useGeneratedKeys="true" keyProperty="id" parameterType="ItemDeliveryBackup">
+		insert into ITEM_DELIVERY_BACKUP (
+			ID,SKU_ID,MARKET_ID,KUNNR,WERKS,MAKTX,
+			MMSTATXT,ZKHSPBM,LBKUM,MEINS,ZDATE,ZTIME,
+			ZUNAME,BACKUPTIME
+    	) values (
+			#{id},#{skuId},#{marketId},#{kunnr},#{werks},#{maktx},
+			#{mmstatxt},#{zkhspbm},#{lbkum},#{meins},#{zdate},#{ztime},
+			#{zuname},#{backuptime}
+    	)
+	</insert>
+
+	<insert id="insertBatch" parameterType="ArrayList">
+		insert into ITEM_DELIVERY_BACKUP (
+		ID,SKU_ID,MARKET_ID,KUNNR,WERKS,MAKTX,
+		MMSTATXT,ZKHSPBM,LBKUM,MEINS,
+		ZDATE,ZTIME,ZUNAME,BACKUPTIME)
+		values
+		<foreach collection="list" item="obj" index="index" separator="," >
+			(#{obj.id},#{obj.skuId},#{obj.marketId},#{obj.kunnr},#{obj.werks},#{obj.maktx},
+			#{obj.mmstatxt},#{obj.zkhspbm},#{obj.lbkum},#{obj.meins},#{obj.zdate},#{obj.ztime},
+			#{obj.zuname},#{obj.backuptime})
+		</foreach>
+	</insert>
+
+	<delete id="deleteByTime" parameterType="java.lang.Long">
+		delete from ITEM_DELIVERY_BACKUP where BACKUPTIME = #{backuptime}
+	</delete>
+
+	<select id="calBackUpDValue" parameterType="map" resultType="int">
+		select abs(A.num - B.num) from  (select count(1) as num from ITEM_DELIVERY_BACKUP where BACKUPTIME = #{lastTime}) A ,(select count(1) as num from ITEM_DELIVERY_BACKUP where BACKUPTIME = #{preTime}) B
+	</select>
+
+	<select id="getUpdateTime" parameterType="map" resultType="String">
+		select concat(t.ZDATE,' : ',t.ZTIME)  from ITEM_DELIVERY_BACKUP t where BACKUPTIME = #{backuptime} limit 1
+	</select>
+
+
+</mapper>

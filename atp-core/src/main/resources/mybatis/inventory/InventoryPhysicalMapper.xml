@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.lsh.atp.core.dao.inventory.InventoryPhysicalDao">
+
+    <resultMap id="resultMap" type="InventoryPhysical">
+        <id     property="id"            column="ID"             jdbcType="BIGINT" javaType="java.lang.Long" />
+        <result property="warehouseCode" column="WAREHOUSE_CODE" jdbcType="VARCHAR" javaType="java.lang.String" />
+        <result property="skuId"         column="SKU_ID"         jdbcType="BIGINT"  javaType="java.lang.Long" />
+        <result property="skuQuantity"   column="SKU_QUANTITY"   jdbcType="BIGINT"  javaType="java.lang.Long" />
+        <result property="createdAt"     column="CREATED_AT"     jdbcType="INTEGER" javaType="java.lang.Integer" />
+        <result property="updatedAt"     column="UPDATED_AT"     jdbcType="INTEGER" javaType="java.lang.Integer" />
+    </resultMap>
+
+    <sql id="columns">
+        ID,
+        WAREHOUSE_CODE,
+        SKU_ID,
+        SKU_QUANTITY,
+        CREATED_AT,
+        UPDATED_AT
+    </sql>
+
+    <sql id="conditions">
+        <if test="id != null">
+            and ID = #{id, jdbcType=BIGINT}
+        </if>
+        <if test="warehouseCode != null">
+            and WAREHOUSE_CODE = #{warehouseCode, jdbcType=VARCHAR}
+        </if>
+        <if test="skuId != null">
+            and SKU_ID = #{skuId, jdbcType=BIGINT}
+        </if>
+        <if test="skuQuantity != null">
+            and SKU_QUANTITY = #{skuQuantity, jdbcType=BIGINT}
+        </if>
+        <if test="createdAt != null">
+            and CREATED_AT = #{createdAt, jdbcType=INTEGER}
+        </if>
+        <if test="updatedAt != null">
+            and UPDATED_AT = #{updatedAt, jdbcType=INTEGER}
+        </if>
+    </sql>
+
+    <sql id="select">
+        select
+        <include refid="columns" />
+        from
+        INVENTORY_PHYSICAL
+        <where>
+            <include refid="conditions" />
+        </where>
+    </sql>
+
+    <insert id="insert" parameterType="InventoryPhysical">
+        insert into INVENTORY_PHYSICAL
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            ID,
+            <if test="warehouseCode != null">
+                WAREHOUSE_CODE,
+            </if>
+            <if test="skuId != null">
+                SKU_ID,
+            </if>
+            <if test="skuQuantity != null">
+                SKU_QUANTITY,
+            </if>
+            <if test="createdAt != null">
+                CREATED_AT,
+            </if>
+            <if test="updatedAt != null">
+                UPDATED_AT,
+            </if>
+        </trim>
+        values
+        <trim prefix="(" suffixOverrides="," suffix=")">
+            #{id, jdbcType=BIGINT},
+            <if test="warehouseCode != null">
+                #{warehouseCode, jdbcType=VARCHAR},
+            </if>
+            <if test="skuId != null">
+                #{skuId, jdbcType=BIGINT},
+            </if>
+            <if test="skuQuantity != null">
+                #{skuQuantity, jdbcType=BIGINT},
+            </if>
+            <if test="createdAt != null">
+                #{createdAt, jdbcType=INTEGER},
+            </if>
+            <if test="updatedAt != null">
+                #{updatedAt, jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="update" parameterType="InventoryPhysical">
+        update INVENTORY_PHYSICAL
+        <set>
+            <if test="warehouseCode != null">
+                WAREHOUSE_CODE = #{warehouseCode, jdbcType=VARCHAR},
+            </if>
+            <if test="skuId != null">
+                SKU_ID = #{skuId, jdbcType=BIGINT},
+            </if>
+            <if test="skuQuantity != null">
+                SKU_QUANTITY = #{skuQuantity, jdbcType=BIGINT},
+            </if>
+            <if test="createdAt != null">
+                CREATED_AT = #{createdAt, jdbcType=INTEGER},
+            </if>
+            <if test="updatedAt != null">
+                UPDATED_AT = #{updatedAt, jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id, jdbcType=BIGINT}
+    </update>
+
+    <delete id="delete" parameterType="java.lang.Long">
+        delete from INVENTORY_PHYSICAL where id = #{id, jdbcType=BIGINT}
+    </delete>
+
+    <select id="get" parameterType="java.lang.Long" resultMap="resultMap">
+        select
+          <include refid="columns" />
+        from
+          INVENTORY_PHYSICAL
+        where
+          id = #{id, jdbcType=BIGINT}
+    </select>
+
+    <select id="findOne" parameterType="InventoryPhysical" resultMap="resultMap">
+        <include refid="select" />
+    </select>
+
+    <select id="findList" parameterType="InventoryPhysical" resultMap="resultMap">
+        <include refid="select" />
+    </select>
+
+    <select id="count" parameterType="InventoryPhysical" resultType="java.lang.Integer">
+        select
+        count(*)
+        from
+        INVENTORY_PHYSICAL
+        <where>
+            <include refid="conditions" />
+        </where>
+    </select>
+</mapper>

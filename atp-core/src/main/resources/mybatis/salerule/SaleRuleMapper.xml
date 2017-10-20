@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lsh.atp.core.dao.salerule.SaleRuleDao" >
+  <resultMap id="BaseResultMap" type="com.lsh.atp.core.model.salerule.SaleRule" >
+    <id column="id" property="id" jdbcType="BIGINT" />
+    <result column="zone_code" property="zoneCode" jdbcType="VARCHAR" />
+    <result column="rule_code" property="ruleCode" jdbcType="BIGINT" />
+    <result column="rule_name" property="ruleName" jdbcType="VARCHAR" />
+    <result column="created_at" property="createdAt" jdbcType="INTEGER" />
+    <result column="updated_at" property="updatedAt" jdbcType="INTEGER" />
+    <result column="valid" property="valid" jdbcType="INTEGER" />
+    <result column="type" property="type" jdbcType="INTEGER" />
+    <result column="supplys" property="supplys" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    id, zone_code, rule_code, rule_name, created_at, updated_at, valid, type
+  </sql>
+
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Long" >
+    select 
+    <include refid="Base_Column_List" />
+    from SALE_RULE
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long" >
+    delete from SALE_RULE
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
+  <insert id="insert" parameterType="com.lsh.atp.core.model.salerule.SaleRule" >
+    insert into SALE_RULE (id, zone_code, rule_code, 
+      rule_name, created_at, updated_at, 
+      valid, type)
+    values (#{id,jdbcType=BIGINT}, #{zoneCode,jdbcType=VARCHAR}, #{ruleCode,jdbcType=BIGINT}, 
+      #{ruleName,jdbcType=VARCHAR}, #{createdAt,jdbcType=INTEGER}, #{updatedAt,jdbcType=INTEGER}, 
+      #{valid,jdbcType=INTEGER},#{type,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.lsh.atp.core.model.salerule.SaleRule" >
+    insert into SALE_RULE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="zoneCode != null" >
+        zone_code,
+      </if>
+      <if test="ruleCode != null" >
+        rule_code,
+      </if>
+      <if test="ruleName != null" >
+        rule_name,
+      </if>
+      <if test="createdAt != null" >
+        created_at,
+      </if>
+      <if test="updatedAt != null" >
+        updated_at,
+      </if>
+      <if test="valid != null" >
+        valid,
+      </if>
+      <if test="type != null" >
+        type
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=BIGINT},
+      </if>
+      <if test="zoneCode != null" >
+        #{zoneCode,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleCode != null" >
+        #{ruleCode,jdbcType=BIGINT},
+      </if>
+      <if test="ruleName != null" >
+        #{ruleName,jdbcType=VARCHAR},
+      </if>
+      <if test="createdAt != null" >
+        #{createdAt,jdbcType=INTEGER},
+      </if>
+      <if test="updatedAt != null" >
+        #{updatedAt,jdbcType=INTEGER},
+      </if>
+      <if test="valid != null" >
+        #{valid,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        #{type,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.lsh.atp.core.model.salerule.SaleRule" >
+    update SALE_RULE
+    <set >
+      <if test="zoneCode != null" >
+        zone_code = #{zoneCode,jdbcType=VARCHAR},
+      </if>
+      <if test="ruleCode != null" >
+        rule_code = #{ruleCode,jdbcType=BIGINT},
+      </if>
+      <if test="ruleName != null" >
+        rule_name = #{ruleName,jdbcType=VARCHAR},
+      </if>
+      <if test="createdAt != null" >
+        created_at = #{createdAt,jdbcType=INTEGER},
+      </if>
+      <if test="updatedAt != null" >
+        updated_at = #{updatedAt,jdbcType=INTEGER},
+      </if>
+      <if test="valid != null" >
+        valid = #{valid,jdbcType=INTEGER},
+      </if>
+      <if test="type != null" >
+        valid = #{type,jdbcType=INTEGER}
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.lsh.atp.core.model.salerule.SaleRule" >
+    update SALE_RULE
+    set zone_code = #{zoneCode,jdbcType=VARCHAR},
+      rule_code = #{ruleCode,jdbcType=BIGINT},
+      rule_name = #{ruleName,jdbcType=VARCHAR},
+      created_at = #{createdAt,jdbcType=INTEGER},
+      updated_at = #{updatedAt,jdbcType=INTEGER},
+      valid = #{valid,jdbcType=INTEGER},
+      type = #{type,jdbcType=INTEGER}
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <select id="selectByZonecode" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select *
+    from SALE_RULE
+    where  zone_code= #{zoneCode,jdbcType=VARCHAR}
+    and valid = 1
+  </select>
+
+  <select id="selectByZonecodeAndType"  resultMap="BaseResultMap">
+    select *
+    from SALE_RULE
+    where  zone_code= #{zoneCode,jdbcType=VARCHAR}
+    and type = #{type,jdbcType=INTEGER}
+    and valid = 1
+  </select>
+
+  <select id="getSupplys"  resultType="java.lang.String">
+    select supplys
+    from SALE_RULE
+    where  zone_code= #{zoneCode,jdbcType=VARCHAR}
+    and rule_code = #{ruleCode,jdbcType=BIGINT}
+    and valid = 1
+  </select>
+
+    <select id="selectBySupplys" resultMap="BaseResultMap">
+        select * from SALE_RULE
+        where
+        zone_code =  #{zoneCode,jdbcType=VARCHAR}
+        and supplys = #{supplys,jdbcType=VARCHAR}
+    </select>
+
+</mapper>
