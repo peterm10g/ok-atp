@@ -2,7 +2,6 @@ package com.lsh.swagger;
 
 import com.alibaba.dubbo.common.URL;
 import com.lsh.swagger.register.RPCSwaggerRegister;
-import com.lsh.swagger.register.SwaggerRegister;
 
 import java.lang.reflect.Method;
 
